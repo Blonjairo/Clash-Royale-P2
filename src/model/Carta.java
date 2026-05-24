@@ -15,6 +15,7 @@ public class Carta {
         this.id = id;
         this.nombre = nombre;
         this.costeElixir = costeElixir;
+        this.tipo = tipo;
         this.calidad = calidad;
     }
 
@@ -32,6 +33,14 @@ public class Carta {
 
     @Override
     public String toString() {
-        return "Carta{id=" + id + ", nombre='" + nombre +"'" + ", costeElixir=" + costeElixir +", tipo=" + tipo + "'" + ", calidad=" + calidad.getNombre() + "}";
+        String tipoValor = (tipo == null) ? "SIN TIPO" : tipo;
+        String calidadValor = (calidad == null) ? "SIN CALIDAD" : calidad.getNombre();
+        return "Carta{" +
+                "id=" + id +
+                ", nombre='" + nombre + "'" +
+                ", costeElixir=" + costeElixir +
+                ", tipo='" + tipoValor + "'" +
+                ", calidad=" + calidadValor +
+                "}";
     }
 }
