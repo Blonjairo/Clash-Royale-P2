@@ -96,6 +96,9 @@ Main.java
 - **main/** → Solo el menú, nunca escribe SQL
 
 ---
+## Diagrama de Clases
+![Diagrama de Clases](docs/diagrama.png)
+---
 
 ## Autor
 **Juan Andrade (Blonjairo)**
