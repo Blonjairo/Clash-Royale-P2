@@ -35,12 +35,7 @@ public class Carta {
     public String toString() {
         String tipoValor = (tipo == null) ? "SIN TIPO" : tipo;
         String calidadValor = (calidad == null) ? "SIN CALIDAD" : calidad.getNombre();
-        return "Carta{" +
-                "id=" + id +
-                ", nombre='" + nombre + "'" +
-                ", costeElixir=" + costeElixir +
-                ", tipo='" + tipoValor + "'" +
-                ", calidad=" + calidadValor +
-                "}";
+        return id + ". " + nombre + ", Elixir = " + costeElixir +", " + tipoValor +
+                ", " + calidadValor;
     }
 }

@@ -20,6 +20,6 @@ public class Calidad {
 
     @Override
     public String toString() {
-        return "Calidad{id=" + id + ", nombre='" + nombre + "'}";
+        return id + ". " + nombre;
     }
 }
