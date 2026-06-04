@@ -1,215 +1,412 @@
 import dao.CalidadDAO;
 import dao.CartaDAO;
 import model.Carta;
+import model.Calidad;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.util.List;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class VentanaPrincipal extends JFrame {
 
-    private JPanel panel1;
-    private JButton NUEVACARTAButton;
-    private JButton NUEVACALIDADButton;
-    private JCheckBox comunCheckBox;
-    private JCheckBox especialCheckBox;
-    private JCheckBox epicaCheckBox;
-    private JCheckBox legendariaCheckBox;
-    private JCheckBox campeonCheckBox;
-    private JTextField textField1;
+    // ─── Colores ──────────────────────────────────────────────────────────────
+    private static final Color C_FONDO_IZQ   = new Color(28, 38, 58);
+    private static final Color C_FONDO_DER   = new Color(18, 22, 38);
+    private static final Color C_CABECERA    = new Color(12, 16, 30);
+    private static final Color C_BOTON       = new Color(40, 55, 90);
+    private static final Color C_BOTON_HOVER = new Color(55, 75, 120);
+    private static final Color C_TEXTO       = new Color(220, 225, 255);
+    private static final Color C_SUBTITULO   = new Color(140, 155, 200);
+    private static final Color C_TITULO      = new Color(232, 200, 74);
 
-//DAOs
-    private final CartaDAO cartaDAO = new CartaDAO();
-    private final  CalidadDAO calidadDAO = new CalidadDAO();
+    // DAOs
+    private final CartaDAO   cartaDAO   = new CartaDAO();
+    private final CalidadDAO calidadDAO = new CalidadDAO();
 
-    //Panel de Cuadricula
-    private JPanel cuadricula;
+    // Componentes
+    private JPanel     cuadricula;
+    private JTextField txtBuscar;
+    private JCheckBox  cbComun, cbEspecial, cbEpica, cbLegendaria, cbCampeon;
+    private JButton[]  botonesElixir = new JButton[9];
 
-    public VentanaPrincipal()
-    {
+    public VentanaPrincipal() {
         setTitle("Clash Royale Card Manager");
-        setSize(1050, 680);
+        setSize(1100, 700);
+        setMinimumSize(new Dimension(900, 600));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
+        getContentPane().setBackground(C_FONDO_DER);
 
+        add(crearCabecera(),      BorderLayout.NORTH);
+        add(crearPanelIzquierdo(), BorderLayout.WEST);
+        add(crearPanelDerecho(),   BorderLayout.CENTER);
+
+        configurarAcciones();
+    }
+
+    // CABECERA
+    private JPanel crearCabecera() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(C_CABECERA);
+        p.setBorder(new EmptyBorder(10, 20, 10, 20));
+
+        JLabel titulo = new JLabel("CLASH ROYALE - CARTAS ", SwingConstants.CENTER);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 20));
+        titulo.setForeground(C_TITULO);
+        p.add(titulo, BorderLayout.CENTER);
+        return p;
+    }
+
+    // PANEL IZQUIERDO
+    private JPanel crearPanelIzquierdo() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(C_FONDO_IZQ);
+        panel.setPreferredSize(new Dimension(200, 0));
+        panel.setBorder(new EmptyBorder(12, 10, 12, 10));
+
+        // Título gestión
+        panel.add(labelSeccion("AGREGAR"));
+        panel.add(Box.createVerticalStrut(6));
+
+        //Botones principales
+        JButton btnNuevaCarta   = crearBoton("NUEVA CARTA +");
+        JButton btnNuevaCalidad = crearBoton("NUEVA CALIDAD +");
+        btnNuevaCarta.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+        btnNuevaCalidad.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+        panel.add(btnNuevaCarta);
+        panel.add(Box.createVerticalStrut(8));
+        panel.add(btnNuevaCalidad);
+        panel.add(Box.createVerticalStrut(16));
+
+        // Filtros elixir
+        panel.add(labelSeccion("FILTROS"));
+        panel.add(Box.createVerticalStrut(8));
+        panel.add(labelSeccion("Elixir"));
+        panel.add(Box.createVerticalStrut(8));
+
+        ImageIcon gota = iconoElixir(14);
+        JPanel gridElixir = new JPanel(new GridLayout(3, 3, 6, 6));
+        gridElixir.setOpaque(false);
+        for (int i = 0; i < 9; i++) {
+            JButton btn = new JButton(String.valueOf(i + 1));
+            btn.setFont(new Font("SansSerif", Font.BOLD, 12));
+            btn.setBackground(new Color(50, 30, 80));
+            btn.setForeground(new Color(210, 170, 255));
+            btn.setFocusPainted(false);
+            btn.setBorder(BorderFactory.createLineBorder(new Color(90, 50, 130), 1));
+            if (gota != null) btn.setIcon(gota);
+            botonesElixir[i] = btn;
+            gridElixir.add(btn);
+        }
+        panel.add(gridElixir);
+        panel.add(Box.createVerticalStrut(16));
+
+        // Filtros calidad
+        panel.add(labelSeccion("CALIDADES"));
+        panel.add(Box.createVerticalStrut(8));
+
+        cbComun      = crearCheckbox("Común",      new Color(170, 170, 170));
+        cbEspecial   = crearCheckbox("Especial",   new Color(255, 165,   0));
+        cbEpica      = crearCheckbox("Épica",      new Color(150,  50, 220));
+        cbLegendaria = crearCheckbox("Legendaria", new Color(135, 206, 250));
+        cbCampeon    = crearCheckbox("Campeón",    new Color(255, 215,   0));
+
+        for (JCheckBox cb : new JCheckBox[]{cbComun, cbEspecial, cbEpica, cbLegendaria, cbCampeon})
+        {
+            cb.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
+            panel.add(cb);
+            panel.add(Box.createVerticalStrut(4));
+        }
+
+        panel.add(Box.createVerticalGlue());
+
+        // Guardar referencias para acciones
+        btnNuevaCarta.addActionListener(e -> accionNuevaCarta());
+        btnNuevaCalidad.addActionListener(e -> accionNuevaCalidad());
+
+        return panel;
+    }
+
+    // PANEL DERECHO
+    private JPanel crearPanelDerecho() {
+        JPanel panel = new JPanel(new BorderLayout(0, 0));
+        panel.setBackground(C_FONDO_DER);
+
+        // Cabecera derecha
+        JPanel cabDer = new JPanel(new BorderLayout(12, 0));
+        cabDer.setBackground(C_CABECERA);
+        cabDer.setBorder(new EmptyBorder(8, 14, 8, 14));
+
+        JLabel lblBib = new JLabel("BIBLIOTECA DE CARTAS");
+        lblBib.setFont(new Font("SansSerif", Font.BOLD, 13));
+        lblBib.setForeground(C_TEXTO);
+
+        JPanel busqueda = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+        busqueda.setOpaque(false);
+        JLabel lblBuscar = new JLabel("BUSCAR CARTA:");
+        lblBuscar.setForeground(C_SUBTITULO);
+        lblBuscar.setFont(new Font("SansSerif", Font.BOLD, 11));
+        txtBuscar = new JTextField(18);
+        txtBuscar.setBackground(new Color(30, 40, 65));
+        txtBuscar.setForeground(C_TEXTO);
+        txtBuscar.setCaretColor(Color.WHITE);
+        txtBuscar.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(60, 80, 120)),
+                new EmptyBorder(4, 6, 4, 6)));
+        busqueda.add(lblBuscar);
+        busqueda.add(txtBuscar);
+
+        cabDer.add(lblBib,    BorderLayout.WEST);
+        cabDer.add(busqueda,  BorderLayout.EAST);
+        panel.add(cabDer, BorderLayout.NORTH);
+
+        // Cuadrícula
         cuadricula = new JPanel(new GridLayout(0, 4, 10, 10));
-        cuadricula.setBackground(new Color(25, 35, 55));
+        cuadricula.setBackground(C_FONDO_DER);
+        cuadricula.setBorder(new EmptyBorder(12, 12, 12, 12));
 
         JScrollPane scroll = new JScrollPane(cuadricula);
         scroll.setBorder(null);
+        scroll.getViewport().setBackground(C_FONDO_DER);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        panel.add(scroll, BorderLayout.CENTER);
 
-        add(panel1, BorderLayout.WEST);
-        add(scroll, BorderLayout.CENTER);
-
-        configuararAcciones();
-
+        return panel;
     }
 
-    private void configuararAcciones() {
+    //ACCIONES
+    private void configurarAcciones() {
+        // Búsqueda por nombre (Enter)
+        txtBuscar.addActionListener(e -> {
+            String q = txtBuscar.getText().trim().toLowerCase();
+            List<Carta> todas = cartaDAO.findAll();
+            cuadricula.removeAll();
+            for (Carta c : todas)
+                if (c.getNombre().toLowerCase().contains(q))
+                    cuadricula.add(crearTarjeta(c));
+            refrescar();
+        });
 
-        //Boton Nueva Carta
-        NUEVACARTAButton.addActionListener(e ->
-        {
-                String nombre = JOptionPane.showInputDialog(this, "Nombre de la carta:");
-                if (nombre == null || nombre.isBlank()) return;
-                String elixirS = JOptionPane.showInputDialog(this, "Costo de elixir (1-10):");
-                String tipo = JOptionPane.showInputDialog(this,"Tipo (Tropa/Hachizo/Estructura):");
-                String idCalS = JOptionPane.showInputDialog(this, "Calidad (Comun, Especial, Epica, Legendaria):");
-                try {
-                    int elixir = Integer.parseInt(elixirS);
-                    int idCal = Integer.parseInt(idCalS);
-                    model.Calidad cal = calidadDAO.findById(idCal);
-                    if (cal == null) { JOptionPane.showMessageDialog(this, "Calidad no encontrada."); return; }
-                    Carta c = new Carta(0, nombre, elixir, tipo, cal);
-                    boolean ok = cartaDAO.insert(c);
-                    JOptionPane.showMessageDialog(this, ok ? "✔ Carta agregada." : "✘ Error al agregar.");
-                    cargarTodasLasCartas();
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this,"Ingresa numeros validos.");
-                }
-    });
-        //Boton Nueva Calidad
-    NUEVACALIDADButton.addActionListener(e -> {
+        // Checkboxes calidad
+        ActionListener filtroCal = e -> aplicarFiltroCalidad();
+        cbComun.addActionListener(filtroCal);
+        cbEspecial.addActionListener(filtroCal);
+        cbEpica.addActionListener(filtroCal);
+        cbLegendaria.addActionListener(filtroCal);
+        cbCampeon.addActionListener(filtroCal);
+
+        // Botones elixir
+        for (int i = 0; i < 9; i++) {
+            final int elixir = i + 1;
+            botonesElixir[i].addActionListener(e -> filtrarPorElixir(elixir));
+        }
+    }
+
+    private void accionNuevaCarta() {
+        String nombre  = JOptionPane.showInputDialog(this, "Nombre de la carta:");
+        if (nombre == null || nombre.isBlank()) return;
+        String elixirS = JOptionPane.showInputDialog(this, "Costo de elixir (1-9):");
+        String tipo    = JOptionPane.showInputDialog(this, "Tipo (Tropa / Hechizo / Edificio):");
+        String idCalS  = JOptionPane.showInputDialog(this,
+                "ID Calidad:\n1=Común  2=Especial  3=Épica  4=Legendaria  5=Campeón");
+        try {
+            int elixir = Integer.parseInt(elixirS.trim());
+            int idCal  = Integer.parseInt(idCalS.trim());
+            Calidad cal = calidadDAO.findById(idCal);
+            if (cal == null) { JOptionPane.showMessageDialog(this, "Calidad no encontrada."); return; }
+            boolean ok = cartaDAO.insert(new Carta(0, nombre.trim(), elixir, tipo.trim(), cal));
+            JOptionPane.showMessageDialog(this, ok ? "✔ Carta agregada." : "✘ Error al agregar.");
+            cargarTodasLasCartas();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Ingresa números válidos.");
+        }
+    }
+
+    private void accionNuevaCalidad() {
         String nombre = JOptionPane.showInputDialog(this, "Nombre de la calidad:");
         if (nombre == null || nombre.isBlank()) return;
-        boolean ok = calidadDAO.insert(new model.Calidad(0, nombre));
+        boolean ok = calidadDAO.insert(new Calidad(0, nombre.trim()));
         JOptionPane.showMessageDialog(this, ok ? "✔ Calidad agregada." : "✘ Error.");
-    });
+    }
 
-    // ── Búsqueda por nombre ───────────────────────────────────────────────
-        textField1.addActionListener(e -> {
-        String busqueda = textField1.getText().trim().toLowerCase();
+    private void filtrarPorElixir(int elixir) {
+        List<Carta> todas = cartaDAO.findAll();
+        cuadricula.removeAll();
+        for (Carta c : todas)
+            if (c.getCosteElixir() == elixir)
+                cuadricula.add(crearTarjeta(c));
+        refrescar();
+    }
+
+    private void aplicarFiltroCalidad() {
+        boolean ninguna = !cbComun.isSelected() && !cbEspecial.isSelected()
+                && !cbEpica.isSelected() && !cbLegendaria.isSelected()
+                && !cbCampeon.isSelected();
         List<Carta> todas = cartaDAO.findAll();
         cuadricula.removeAll();
         for (Carta c : todas) {
-            if (c.getNombre().toLowerCase().contains(busqueda))
+            String cal = c.getCalidad().getNombre().toLowerCase()
+                    .replace("é","e").replace("ó","o").replace("ú","u");
+            if (ninguna
+                    || (cbComun.isSelected()      && cal.contains("comun"))
+                    || (cbEspecial.isSelected()   && cal.contains("especial"))
+                    || (cbEpica.isSelected()      && cal.contains("epica"))
+                    || (cbLegendaria.isSelected() && cal.contains("legendaria"))
+                    || (cbCampeon.isSelected()    && cal.contains("campeon")))
                 cuadricula.add(crearTarjeta(c));
         }
+        refrescar();
+    }
+
+    public void cargarTodasLasCartas() {
+        List<Carta> lista = cartaDAO.findAll();
+        cuadricula.removeAll();
+        for (Carta c : lista) cuadricula.add(crearTarjeta(c));
+        refrescar();
+    }
+
+    private void refrescar() {
         cuadricula.revalidate();
         cuadricula.repaint();
-    });
-
-    // ── Checkboxes de calidad ─────────────────────────────────────────────
-    ActionListener filtroCalidad = e -> aplicarFiltroCalidad();
-        comunCheckBox.addActionListener(filtroCalidad);
-        especialCheckBox.addActionListener(filtroCalidad);
-        epicaCheckBox.addActionListener(filtroCalidad);
-        legendariaCheckBox.addActionListener(filtroCalidad);
-        campeonCheckBox.addActionListener(filtroCalidad);
-}
-
-// ─── Carga todas las cartas en la cuadrícula ──────────────────────────────
-public void cargarTodasLasCartas() {
-    List<Carta> lista = cartaDAO.findAll();
-    cuadricula.removeAll();
-    for (Carta c : lista) cuadricula.add(crearTarjeta(c));
-    cuadricula.revalidate();
-    cuadricula.repaint();
-}
-
-// ─── Filtro por calidad con checkboxes ────────────────────────────────────
-private void aplicarFiltroCalidad() {
-    boolean ningunaMarcada = !comunCheckBox.isSelected() && !especialCheckBox.isSelected()
-            && !epicaCheckBox.isSelected() && !legendariaCheckBox.isSelected()
-            && !campeonCheckBox.isSelected();
-
-    List<Carta> todas = cartaDAO.findAll();
-    cuadricula.removeAll();
-    for (Carta c : todas) {
-        String cal = c.getCalidad().getNombre().toLowerCase();
-        if (ningunaMarcada
-                || (comunCheckBox.isSelected()     && cal.contains("comun"))
-                || (especialCheckBox.isSelected()  && cal.contains("especial"))
-                || (epicaCheckBox.isSelected()     && cal.contains("epica"))
-                || (legendariaCheckBox.isSelected()&& cal.contains("legendaria"))
-                || (campeonCheckBox.isSelected()   && cal.contains("campeon"))) {
-            cuadricula.add(crearTarjeta(c));
-        }
     }
-    cuadricula.revalidate();
-    cuadricula.repaint();
+
+    // TARJETA
+    private JPanel crearTarjeta(Carta carta) {
+        Color color = colorCalidad(carta.getCalidad().getNombre());
+
+        JPanel tarjeta = new JPanel(new BorderLayout(4, 4));
+        tarjeta.setBackground(color.darker().darker());
+        tarjeta.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(color, 2, true),
+                new EmptyBorder(6, 6, 6, 6)));
+        tarjeta.setPreferredSize(new Dimension(140, 175));
+        tarjeta.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Elixir arriba
+        ImageIcon gota = iconoElixir(13);
+        JLabel lblElixir = gota != null
+                ? new JLabel(" " + carta.getCosteElixir(), gota, SwingConstants.LEFT)
+                : new JLabel("💧 " + carta.getCosteElixir());
+        lblElixir.setFont(new Font("SansSerif", Font.BOLD, 13));
+        lblElixir.setForeground(new Color(210, 170, 255));
+        tarjeta.add(lblElixir, BorderLayout.NORTH);
+
+        // Centro coloreado
+        JPanel centro = new JPanel(new BorderLayout());
+        centro.setBackground(color);
+        JLabel lblTipo = new JLabel(carta.getTipo(), SwingConstants.CENTER);
+        lblTipo.setFont(new Font("SansSerif", Font.ITALIC, 11));
+        lblTipo.setForeground(new Color(255, 255, 255, 160));
+        centro.add(lblTipo, BorderLayout.CENTER);
+        tarjeta.add(centro, BorderLayout.CENTER);
+
+        // Info abajo
+        JPanel info = new JPanel(new GridLayout(2, 1, 0, 2));
+        info.setOpaque(false);
+        JLabel lblNombre = new JLabel(carta.getNombre(), SwingConstants.CENTER);
+        lblNombre.setFont(new Font("SansSerif", Font.BOLD, 11));
+        lblNombre.setForeground(Color.WHITE);
+        JLabel lblCal = new JLabel(carta.getCalidad().getNombre(), SwingConstants.CENTER);
+        lblCal.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        lblCal.setForeground(color.brighter());
+        info.add(lblNombre);
+        info.add(lblCal);
+        tarjeta.add(info, BorderLayout.SOUTH);
+
+        // Clic → detalle
+        tarjeta.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                JOptionPane.showMessageDialog(null,
+                        "ID: "      + carta.getId()
+                                + "\nNombre: " + carta.getNombre()
+                                + "\nElixir: " + carta.getCosteElixir()
+                                + "\nTipo: "   + carta.getTipo()
+                                + "\nCalidad: "+ carta.getCalidad().getNombre(),
+                        "Detalle", JOptionPane.INFORMATION_MESSAGE);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                tarjeta.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(color.brighter(), 3, true),
+                        new EmptyBorder(6, 6, 6, 6)));
+            }
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                tarjeta.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(color, 2, true),
+                        new EmptyBorder(6, 6, 6, 6)));
+            }
+        });
+
+        return tarjeta;
+    }
+
+    //HELPERS
+    private Color colorCalidad(String calidad) {
+        String c = calidad.toLowerCase()
+                .replace("é", "e")
+                .replace("ó", "o")
+                .replace("ú", "u");
+        if (c.contains("especial"))   return new Color(255, 165,   0);
+        if (c.contains("epica"))      return new Color(150,  50, 220);
+        if (c.contains("legendaria")) return new Color(135, 206, 250);
+        if (c.contains("campeon"))    return new Color(255, 215,   0);
+        return new Color(150, 150, 150); // Común
+    }
+
+    private ImageIcon iconoElixir(int size) {
+        try {
+            java.io.File f = new java.io.File(
+                    "C:\\Users\\User\\IdeaProjects\\Clash Royale\\Docs\\elixir.png");
+            if (!f.exists()) return null;
+            Image img = new ImageIcon(f.getAbsolutePath())
+                    .getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+            return new ImageIcon(img);
+        } catch (Exception e) { return null; }
+    }
+
+    private JLabel labelSeccion(String texto) {
+        JLabel lbl = new JLabel(texto);
+        lbl.setFont(new Font("SansSerif", Font.BOLD, 11));
+        lbl.setForeground(C_TITULO);
+        lbl.setAlignmentX(LEFT_ALIGNMENT);
+        return lbl;
+    }
+
+    private JButton crearBoton(String texto) {
+        JButton btn = new JButton(texto);
+        btn.setBackground(C_BOTON);
+        btn.setForeground(C_TEXTO);
+        btn.setFont(new Font("SansSerif", Font.BOLD, 12));
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createLineBorder(new Color(60, 80, 130)));
+        btn.setAlignmentX(LEFT_ALIGNMENT);
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent e) { btn.setBackground(C_BOTON_HOVER); }
+            public void mouseExited(java.awt.event.MouseEvent e)  { btn.setBackground(C_BOTON); }
+        });
+        return btn;
+    }
+
+    private JCheckBox crearCheckbox(String texto, Color color) {
+        JCheckBox cb = new JCheckBox(texto);
+        cb.setFont(new Font("SansSerif", Font.BOLD, 13));
+        cb.setForeground(color);
+        cb.setOpaque(false);
+        cb.setAlignmentX(LEFT_ALIGNMENT);
+        return cb;
+    }
+
+    // MAIN
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            try { UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); }
+            catch (Exception ignored) {}
+            VentanaPrincipal v = new VentanaPrincipal();
+            v.cargarTodasLasCartas();
+            v.setVisible(true);
+        });
+    }
 }
-
-// ─── Crea una tarjeta visual para cada carta ──────────────────────────────
-private JPanel crearTarjeta(Carta carta) {
-    Color colorFondo = colorSegunCalidad(carta.getCalidad().getNombre());
-
-    JPanel tarjeta = new JPanel(new BorderLayout(4, 4));
-    tarjeta.setBackground(colorFondo.darker().darker());
-    tarjeta.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(colorFondo, 2, true),
-            BorderFactory.createEmptyBorder(6, 6, 6, 6)));
-    tarjeta.setPreferredSize(new Dimension(130, 160));
-
-    // Elixir arriba
-    JLabel lblElixir = new JLabel("💧 " + carta.getCosteElixir(), SwingConstants.LEFT);
-    lblElixir.setFont(new Font("SansSerif", Font.BOLD, 12));
-    lblElixir.setForeground(new Color(200, 160, 255));
-    tarjeta.add(lblElixir, BorderLayout.NORTH);
-
-    // Color central (placeholder de imagen)
-    JPanel imgPlaceholder = new JPanel();
-    imgPlaceholder.setBackground(colorFondo);
-    imgPlaceholder.setPreferredSize(new Dimension(100, 80));
-    imgPlaceholder.setBorder(BorderFactory.createLineBorder(colorFondo.brighter(), 1, true));
-    JLabel lblTipo = new JLabel(carta.getTipo(), SwingConstants.CENTER);
-    lblTipo.setForeground(Color.WHITE.darker());
-    lblTipo.setFont(new Font("SansSerif", Font.ITALIC, 11));
-    imgPlaceholder.setLayout(new BorderLayout());
-    imgPlaceholder.add(lblTipo, BorderLayout.CENTER);
-    tarjeta.add(imgPlaceholder, BorderLayout.CENTER);
-
-    // Nombre e insignia calidad abajo
-    JPanel info = new JPanel(new GridLayout(2, 1, 0, 2));
-    info.setOpaque(false);
-
-    JLabel lblNombre = new JLabel(carta.getNombre(), SwingConstants.CENTER);
-    lblNombre.setFont(new Font("SansSerif", Font.BOLD, 11));
-    lblNombre.setForeground(Color.WHITE);
-
-    JLabel lblCal = new JLabel(carta.getCalidad().getNombre(), SwingConstants.CENTER);
-    lblCal.setFont(new Font("SansSerif", Font.PLAIN, 10));
-    lblCal.setForeground(colorFondo.brighter());
-
-    info.add(lblNombre);
-    info.add(lblCal);
-    tarjeta.add(info, BorderLayout.SOUTH);
-
-    // Clic en tarjeta → buscar por ID
-    tarjeta.addMouseListener(new java.awt.event.MouseAdapter() {
-        public void mouseClicked(java.awt.event.MouseEvent evt) {
-            JOptionPane.showMessageDialog(null,
-                    "ID: " + carta.getId() + "\nNombre: " + carta.getNombre()
-                            + "\nElixir: " + carta.getCosteElixir()
-                            + "\nTipo: " + carta.getTipo()
-                            + "\nCalidad: " + carta.getCalidad().getNombre(),
-                    "Detalle de Carta", JOptionPane.INFORMATION_MESSAGE);
-        }
-    });
-
-    return tarjeta;
-}
-
-// ─── Color según calidad ──────────────────────────────────────────────────
-private Color colorSegunCalidad(String calidad) {
-    return switch (calidad.toLowerCase()) {
-        case "especial"   -> new Color(70,  120, 200);
-        case "epica"      -> new Color(130,  50, 180);
-        case "legendaria" -> new Color(200, 150,  30);
-        case "campeon"    -> new Color(200,  80,  30);
-        default           -> new Color(60,  120,  60); // Comun
-    };
-}
-
-public static void main(String[] args) {
-    SwingUtilities.invokeLater(() -> {
-        VentanaPrincipal v = new VentanaPrincipal();
-        v.cargarTodasLasCartas();
-        v.setVisible(true);
-    });
-}
-}
-
-
