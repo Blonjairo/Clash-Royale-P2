@@ -66,34 +66,63 @@ public class VentanaPrincipal extends JFrame {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(C_FONDO_IZQ);
         panel.setPreferredSize(new Dimension(200, 0));
-        panel.setBorder(new EmptyBorder(12, 10, 12, 10));
+        panel.setBorder(new EmptyBorder(16, 4, 16, 4));
+        panel.setAlignmentX(LEFT_ALIGNMENT);
 
-        // Título gestión
-        panel.add(labelSeccion("AGREGAR"));
-        panel.add(Box.createVerticalStrut(6));
+        //AGREGAR
+        JPanel fila = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        fila.setOpaque(false);
+        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        fila.add(labelSeccion("AGREGAR", 16));
+        panel.add(fila);
+        panel.add(Box.createVerticalStrut(10));
 
-        //Botones principales
         JButton btnNuevaCarta   = crearBoton("NUEVA CARTA +");
         JButton btnNuevaCalidad = crearBoton("NUEVA CALIDAD +");
-        btnNuevaCarta.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
-        btnNuevaCalidad.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
-        panel.add(btnNuevaCarta);
-        panel.add(Box.createVerticalStrut(8));
-        panel.add(btnNuevaCalidad);
-        panel.add(Box.createVerticalStrut(16));
+        btnNuevaCarta.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+        btnNuevaCarta.setAlignmentX(LEFT_ALIGNMENT);
+        btnNuevaCalidad.setAlignmentX(LEFT_ALIGNMENT);
+        btnNuevaCalidad.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+        btnNuevaCarta.setAlignmentX(LEFT_ALIGNMENT);
+        btnNuevaCalidad.setAlignmentX(LEFT_ALIGNMENT);
+        btnNuevaCarta.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnNuevaCalidad.setFont(new Font("SansSerif", Font.BOLD, 14));
 
-        // Filtros elixir
-        panel.add(labelSeccion("FILTROS"));
-        panel.add(Box.createVerticalStrut(8));
-        panel.add(labelSeccion("Elixir"));
-        panel.add(Box.createVerticalStrut(8));
+        JPanel filaBtnCarta = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        filaBtnCarta.setOpaque(false);
+        filaBtnCarta.setMaximumSize(new Dimension(Integer.MAX_VALUE, 48));
+        filaBtnCarta.add(btnNuevaCarta);
+        panel.add(filaBtnCarta);
+        panel.add(Box.createVerticalStrut(4));
 
-        ImageIcon gota = iconoElixir(14);
-        JPanel gridElixir = new JPanel(new GridLayout(3, 3, 6, 6));
+        JPanel filaBtnCal = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        filaBtnCal.setOpaque(false);
+        filaBtnCal.setMaximumSize(new Dimension(Integer.MAX_VALUE, 48));
+        filaBtnCal.add(btnNuevaCalidad);
+        panel.add(filaBtnCal);
+        panel.add(Box.createVerticalStrut(20));
+
+        //FILTROS
+        JPanel filaFiltros = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        filaFiltros.setOpaque(false);
+        filaFiltros.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        filaFiltros.add(labelSeccion("FILTROS", 16));
+        panel.add(filaFiltros);
+        panel.add(Box.createVerticalStrut(4));
+        JPanel filaElixir = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        filaElixir.setOpaque(false);
+        filaElixir.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
+        filaElixir.add(labelSeccion("Elixir", 16));
+        panel.add(filaElixir);
+        panel.add(Box.createVerticalStrut(10));
+
+        ImageIcon gota = iconoElixir(16);
+        JPanel gridElixir = new JPanel(new GridLayout(3, 3, 8, 8));
         gridElixir.setOpaque(false);
+        gridElixir.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
         for (int i = 0; i < 9; i++) {
             JButton btn = new JButton(String.valueOf(i + 1));
-            btn.setFont(new Font("SansSerif", Font.BOLD, 12));
+            btn.setFont(new Font("SansSerif", Font.BOLD, 13));
             btn.setBackground(new Color(50, 30, 80));
             btn.setForeground(new Color(210, 170, 255));
             btn.setFocusPainted(false);
@@ -103,28 +132,33 @@ public class VentanaPrincipal extends JFrame {
             gridElixir.add(btn);
         }
         panel.add(gridElixir);
-        panel.add(Box.createVerticalStrut(16));
+        panel.add(Box.createVerticalStrut(20));
 
-        // Filtros calidad
-        panel.add(labelSeccion("CALIDADES"));
-        panel.add(Box.createVerticalStrut(8));
+        //CALIDADES
+        JPanel filaCal = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        filaCal.setOpaque(false);
+        filaCal.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        filaCal.add(labelSeccion("CALIDADES", 16));
+        panel.add(filaCal);
+        panel.add(Box.createVerticalStrut(10));
 
-        cbComun      = crearCheckbox("Común",      new Color(170, 170, 170));
-        cbEspecial   = crearCheckbox("Especial",   new Color(255, 165,   0));
-        cbEpica      = crearCheckbox("Épica",      new Color(150,  50, 220));
-        cbLegendaria = crearCheckbox("Legendaria", new Color(135, 206, 250));
-        cbCampeon    = crearCheckbox("Campeón",    new Color(255, 215,   0));
+        cbComun      = crearCheckbox("Común",      new Color(170, 170, 170), 14);
+        cbEspecial   = crearCheckbox("Especial",   new Color(255, 165,   0), 14);
+        cbEpica      = crearCheckbox("Épica",      new Color(150,  50, 220), 14);
+        cbLegendaria = crearCheckbox("Legendaria", new Color(135, 206, 250), 14);
+        cbCampeon    = crearCheckbox("Campeón",    new Color(255, 215,   0), 14);
 
-        for (JCheckBox cb : new JCheckBox[]{cbComun, cbEspecial, cbEpica, cbLegendaria, cbCampeon})
-        {
-            cb.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
-            panel.add(cb);
+        for (JCheckBox cb : new JCheckBox[]{cbComun, cbEspecial, cbEpica, cbLegendaria, cbCampeon}) {
+            JPanel filaCb = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+            filaCb.setOpaque(false);
+            filaCb.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
+            filaCb.add(cb);
+            panel.add(filaCb);
             panel.add(Box.createVerticalStrut(4));
         }
 
         panel.add(Box.createVerticalGlue());
 
-        // Guardar referencias para acciones
         btnNuevaCarta.addActionListener(e -> accionNuevaCarta());
         btnNuevaCalidad.addActionListener(e -> accionNuevaCalidad());
 
@@ -367,9 +401,9 @@ public class VentanaPrincipal extends JFrame {
         } catch (Exception e) { return null; }
     }
 
-    private JLabel labelSeccion(String texto) {
+    private JLabel labelSeccion(String texto, int size) {
         JLabel lbl = new JLabel(texto);
-        lbl.setFont(new Font("SansSerif", Font.BOLD, 11));
+        lbl.setFont(new Font("SansSerif", Font.BOLD, size));
         lbl.setForeground(C_TITULO);
         lbl.setAlignmentX(LEFT_ALIGNMENT);
         return lbl;
@@ -377,25 +411,32 @@ public class VentanaPrincipal extends JFrame {
 
     private JButton crearBoton(String texto) {
         JButton btn = new JButton(texto);
-        btn.setBackground(C_BOTON);
-        btn.setForeground(C_TEXTO);
-        btn.setFont(new Font("SansSerif", Font.BOLD, 12));
+        btn.setBackground(new Color(45, 60, 100));
+        btn.setForeground(C_TITULO);
+        btn.setFont(new Font("SansSerif", Font.BOLD, 13));
         btn.setFocusPainted(false);
-        btn.setBorder(BorderFactory.createLineBorder(new Color(60, 80, 130)));
-        btn.setAlignmentX(LEFT_ALIGNMENT);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(C_TITULO, 1, true),
+                new EmptyBorder(8, 14, 8, 14)));
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent e) { btn.setBackground(C_BOTON_HOVER); }
-            public void mouseExited(java.awt.event.MouseEvent e)  { btn.setBackground(C_BOTON); }
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btn.setBackground(new Color(70, 90, 140));
+            }
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btn.setBackground(new Color(45, 60, 100));
+            }
         });
         return btn;
     }
 
-    private JCheckBox crearCheckbox(String texto, Color color) {
+    private JCheckBox crearCheckbox(String texto, Color color, int size) {
         JCheckBox cb = new JCheckBox(texto);
-        cb.setFont(new Font("SansSerif", Font.BOLD, 13));
+        cb.setFont(new Font("SansSerif", Font.BOLD, size));
         cb.setForeground(color);
         cb.setOpaque(false);
         cb.setAlignmentX(LEFT_ALIGNMENT);
+        cb.setHorizontalAlignment(SwingConstants.LEFT);
         return cb;
     }
 
