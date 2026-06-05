@@ -1,0 +1,26 @@
+============================================================
+  REPORTE DE CARTAS - CLASH ROYALE MANAGER
+  Fecha: Thu Jun 04 21:57:44 GMT-05:00 2026
+  Total de cartas: 18
+============================================================
+ID    Nombre                 Elixir   Tipo         Calidad        
+------------------------------------------------------------
+1     Gigante                5        Tropa        Comun          
+2     Mosquetera             4        Tropa        Comun          
+3     Esqueletos             1        Hechizo      Comun          
+4     Bola de Fuego          4        Hechizo      Especial       
+5     Mini P.E.K.K.A         4        Tropa        Especial       
+6     Montapuercos           4        Tropa        Especial       
+7     Tronco                 2        Hechizo      Legendaria     
+8     Principe               5        Tropa        Epica          
+9     P.E.K.K.A              7        Tropa        Epica          
+10    Espejo                 3        Hechizo      Epica          
+11    Mega Caballero         7        Tropa        Legendaria     
+12    Arquero magico         4        Tropa        Legendaria     
+13    Bandida Lider          6        Tropa        Campeon        
+15    Rey Esqueleto          4        Tropa        Campeon        
+16    Chispitas              6        Tropa        Legendaria     
+17    Ballesta               6        Edificio     Epica          
+18    Princesa               3        Tropa        Legendaria     
+19    Espiritu de Fuego      1        Tropa        Comun          
+============================================================
